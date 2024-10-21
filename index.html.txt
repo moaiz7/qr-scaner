@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Attendance System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        #scanner-container {
+            margin: 20px auto;
+            width: 300px;
+            height: 300px;
+            border: 1px solid #ccc;
+            position: relative;
+        }
+        #result {
+            margin-top: 20px;
+            font-size: 1.2em;
+        }
+        .error {
+            color: red;
+        }
+        .success {
+            color: green;
+        }
+    </style>
+</head>
+<body>
+
+<h1>QR Code Attendance System</h1>
+<p>Scan your student QR code below:</p>
+
+<div id="scanner-container"></div>
+<p id="result"></p>
+
+<script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
+<script>
+    const validStudentIds = ["12345", "67890", "54321", "09876"]; // Add valid student IDs here
+
+    const scanner = new Html5Qrcode("scanner-container");
+
+    function onScanSuccess(decodedText, decodedResult) {
+        let resultElement = document.getElementById("result");
+
+        // Check if the scanned QR code matches a valid student ID
+        if (validStudentIds.includes(decodedText)) {
+            resultElement.innerHTML = `<span class="success">Welcome! Student ID ${decodedText} marked as present.</span>`;
+            // You can send the data to a backend or store it in a file/database here
+        } else {
+            resultElement.innerHTML = `<span class="error">Error: QR code not linked to any student.</span>`;
+        }
+
+        // Stop the scanner after one scan
+        scanner.stop().then(() => {
+            console.log("Scanner stopped.");
+        }).catch(err => {
+            console.error("Scanner stop error:", err);
+        });
+    }
+
+    function onScanFailure(error) {
+        // Handle scan failure (not required but useful for debugging)
+        console.warn(`QR Code scan failed. Reason: ${error}`);
+    }
+
+    scanner.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, onScanSuccess, onScanFailure)
+        .catch(err => {
+            console.error("Unable to start scanning.", err);
+        });
+</script>
+
+</body>
+</html>
